@@ -28,7 +28,7 @@ const InvoiceQueryGenerator: React.FC<Props> = () => {
 
   return (
     <Container className="my-3">
-      <h1>Invoice Query Generator</h1>
+      <h1><span>🔷 </span>Invoice Query Generator</h1>
       <Row className="my-3">
         <Col xs={12} md={8}>
           <Form.Control

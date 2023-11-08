@@ -37,7 +37,7 @@ const ListComparator: React.FC<ListComparatorProps> = () => {
 
   return (
     <Container className="my-3">
-      <h1>List Comparator</h1>
+      <h1><span>🔷 </span>List Comparator</h1>
       <Row className="my-3">
         <p>Original invoice list</p>
         <Col xs={12}>

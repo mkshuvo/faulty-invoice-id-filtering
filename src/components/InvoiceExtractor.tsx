@@ -1,12 +1,10 @@
 'use client';
-import { useState } from "react";
+import React, { useState } from "react";
 import { Button, Col, Container, Form, Row } from "react-bootstrap";
 
-interface InvoiceExtractorProps {
-  onExtract: (invoiceIds: number[]) => void;
-}
+interface InvoiceExtractorProps {}
 
-const InvoiceExtractor: React.FC<InvoiceExtractorProps> = ({ onExtract }) => {
+const InvoiceExtractor: React.FC<InvoiceExtractorProps> = () => {
   const [multilineString, setMultilineString] = useState<string>("");
   const [extractedIds, setExtractedIds] = useState<number[]>([]);
   const [copyIcon, setCopyIcon] = useState<string>("📋");
@@ -18,11 +16,9 @@ const InvoiceExtractor: React.FC<InvoiceExtractorProps> = ({ onExtract }) => {
         parseInt(match.replace("Invoice ", ""), 10)
       );
       setExtractedIds(invoiceIds);
-      onExtract(invoiceIds);
       setCopyIcon('📋');
     } else {
       setExtractedIds([]);
-      onExtract([]);
     }
   };
 
@@ -33,7 +29,7 @@ const InvoiceExtractor: React.FC<InvoiceExtractorProps> = ({ onExtract }) => {
 
   return (
     <Container className="my-3">
-      <h1>Invoice ID Extractor</h1>
+      <h1><span>🔷 </span>Invoice ID Extractor</h1>
       <Row className="my-3">
         <Col xs={12}>
           <Form.Group>
@@ -59,7 +55,8 @@ const InvoiceExtractor: React.FC<InvoiceExtractorProps> = ({ onExtract }) => {
         <Row className="my-3">
           <Col xs={12}>
             <Button variant="" onClick={handleCopyIds}>
-              <span className="copyIcon">{copyIcon}</span></Button>
+              <span className="copyIcon">{copyIcon}</span>
+            </Button>
             <p>Extracted Invoice IDs:</p>
             <ol style={{ columns: "4", listStyleType: "decimal" }}>
               {extractedIds.map((id) => (

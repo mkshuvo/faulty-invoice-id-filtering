@@ -35,7 +35,7 @@ const NumberStatistics: React.FC<NumberStatisticsProps> = () => {
 
   return (
     <Container className="my-3">
-      <h1>Number Statistics</h1>
+      <h1><span>🔷 </span>Number Statistics</h1>
       <Row className="my-3">
         <Col xs={12}>
           <Form.Group>

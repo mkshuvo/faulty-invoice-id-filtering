@@ -25,6 +25,9 @@ const InvoiceExtractor: React.FC<InvoiceExtractorProps> = () => {
   const handleCopyIds = () => {
     navigator.clipboard.writeText(extractedIds.join(", "));
     setCopyIcon('✅');
+    setInterval(() => {
+      setCopyIcon('📋');
+    }, 3000);
   };
 
   return (
@@ -55,7 +58,7 @@ const InvoiceExtractor: React.FC<InvoiceExtractorProps> = () => {
         <Row className="my-3">
           <Col xs={12}>
             <Button variant="" onClick={handleCopyIds}>
-              <span className="copyIcon">{copyIcon}</span>
+              <span className="copyIcon" style={{ fontSize: '3rem' }}>{copyIcon}</span>
             </Button>
             <p>Extracted Invoice IDs:</p>
             <ol style={{ columns: "4", listStyleType: "decimal" }}>

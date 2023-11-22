@@ -1,15 +1,19 @@
 'use client';
-import { useState } from "react";
+import React, { useState } from "react";
 import { Button, Col, Container, Row } from "react-bootstrap";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import CSVReader from "react-csv-reader";
-import { create } from "domain";
+import { useDispatch } from "react-redux";
+import { addInvoice } from "../redux/invoiceSlice";
+import { toast } from "react-toastify";
+
 
 interface Props { }
 
 const InvoiceQueryGenerator: React.FC<Props> = () => {
-  const [invoiceIds, setInvoiceIds] = useState<number[]>([]);
+  const dispatch = useDispatch();
+  const [invoiceData, setInvoiceData] = useState<{ id: number; amount: number }[]>([]);
   const [createdDate, setCreatedDate] = useState<string>("");
   const [query, setQuery] = useState<string>("");
   const [copyIconInQuery, setCopyIconInQuery] = useState<string>("📋");
@@ -17,21 +21,39 @@ const InvoiceQueryGenerator: React.FC<Props> = () => {
 
   const handleFileUpload = (data: any, fileInfo: any) => {
     const invoicesColumnIndex = data[0].indexOf("Invoice ID");
+    const amountColumnIndex = data[0].indexOf("Amount");
 
-    if (invoicesColumnIndex !== -1) {
-      const invoices = data.slice(1)
-        .map((row: any) => row[invoicesColumnIndex])
-        .filter((id: any) => id.trim() !== "" && !isNaN(id))  // Filter out empty values and non-numeric values
-        .map((id: any) => parseInt(id.trim(), 10)); // Convert to numbers
+    if (invoicesColumnIndex !== -1 && amountColumnIndex !== -1) {
+      const invoicesWithAmounts = data.slice(1).map((row: any) => ({
+        id: parseInt(row[invoicesColumnIndex], 10),
+        amount: parseFloat(row[amountColumnIndex]),
+      })).filter((row: any) => !isNaN(row.id));;
 
-      setInvoiceIds(invoices);
+      setInvoiceData(invoicesWithAmounts);
+      toast.success('Upload success', {
+        position: "bottom-left",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "colored",
+      });
     } else {
-      alert('Column "Invoice ID" not found in the CSV file.');
+      toast.error('Columns "Invoice ID" and "Amount" not found in the CSV file.', {
+        position: "bottom-left",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+      });
     }
   };
 
-  
-  
   const handleGenerateQuery = () => {
     const createdDateValue = createdDate ? `created > '${createdDate}' AND` : '';
     const query = `SELECT * FROM pay_accounting pa 
@@ -41,32 +63,71 @@ const InvoiceQueryGenerator: React.FC<Props> = () => {
                       AND workorder_id = -1 
                       AND status = 'completed' 
                       ${createdDateValue}
-                      AND ${invoiceIds
-      .map((id) => `status_reason LIKE '%Invoice ${id}%'`)
-      .join(" OR ")};`;
+                      AND ${invoiceData
+        .map((data) => `status_reason LIKE '%Invoice ${data.id}%'`)
+        .join(" OR ")};`;
     setQuery(query);
     setCopyIconInQuery('📋');
+    toast.success('Query Generated!', {
+      position: "bottom-left",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "colored",
+    });
   };
 
   const handleCopyQuery = () => {
     navigator.clipboard.writeText(query);
     setCopyIconInQuery('✅');
+    toast.success('Query Copied!', {
+      position: "bottom-left",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "colored",
+    });
     setInterval(() => {
       setCopyIconInQuery('📋');
     }, 3000);
   };
 
   const handleCopyInvoiceList = () => {
-    navigator.clipboard.writeText(invoiceIds.join(", "));
+    navigator.clipboard.writeText(invoiceData.map((data) => data.id).join(", "));
     setCopyIconInList('✅');
+    toast.success('Invoice List Copied!', {
+      position: "bottom-left",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "colored",
+    });
     setInterval(() => {
       setCopyIconInList('📋');
     }, 3000);
   };
 
+  // Dispatch invoices with amounts to the Redux store
+  React.useEffect(() => {
+    invoiceData.forEach((data) => {
+      dispatch(addInvoice(data));
+    });
+  }, [dispatch, invoiceData]);
+
   return (
     <Container className="my-3">
-      <h1><span>🔷 </span>Invoice Query Generator</h1>
+      <h1>
+        <span>🔷 </span>Invoice Query Generator
+      </h1>
       <Row className="my-3">
         <Col xs={12} md={4}>
           <CSVReader
@@ -79,16 +140,18 @@ const InvoiceQueryGenerator: React.FC<Props> = () => {
           </label>
         </Col>
       </Row>
-      {invoiceIds.length > 0 && (
+      {invoiceData.length > 0 && (
         <Row>
           <Col xs={12}>
             <Button variant="" onClick={handleCopyInvoiceList}>
-              <span className="copyIcon" style={{ fontSize: '3rem' }}>{copyIconInList}</span>
+              <span className="copyIcon" style={{ fontSize: '3rem' }}>
+                {copyIconInList}
+              </span>
             </Button>
             <br />
             <ol style={{ columns: "4", listStyleType: "decimal" }}>
-              {invoiceIds.map((id, index) => (
-                <li key={index}>{id}</li>
+              {invoiceData.map((data, index) => (
+                <li key={index}>{data.id} <span style={{fontWeight:'bold'}}>-{">"}</span> <span style={{color:'green'}}>${data.amount}</span></li>
               ))}
             </ol>
           </Col>
@@ -118,7 +181,9 @@ const InvoiceQueryGenerator: React.FC<Props> = () => {
             <div className="bg-light p-3 my-3">
               <h4>
                 <Button variant="" onClick={handleCopyQuery}>
-                  <span className="copyIcon" style={{ fontSize: '3rem' }}>{copyIconInQuery}</span>
+                  <span className="copyIcon" style={{ fontSize: '3rem' }}>
+                    {copyIconInQuery}
+                  </span>
                 </Button>{" "}
                 Generated Query:
               </h4>

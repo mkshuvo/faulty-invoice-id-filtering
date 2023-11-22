@@ -1,22 +1,17 @@
-import InvoiceQueryGenerator from '@/components/InvoiceQueryGenerator'
-import InvoiceExtractor from '@/components/InvoiceExtractor'
-import NumberStatistics from '@/components/NumberStatistics'
-import ListComparator from '@/components/ListComparator'
+'use client'
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { Provider } from 'react-redux';
+import store from '@/redux/store';
+import 'react-toastify/dist/ReactToastify.css';
+import { Toast } from '@/components/ToastContainer';
+import { App } from '../components/app';
+
 export default function Home() {
   return (
-    <main>
-      <br />
-      <h1 className='text-center'><span>🟦 </span>Invoice ID Troubleshooting tools.<span>🟦</span></h1>
-      <br />
-      <br />
-      <InvoiceQueryGenerator />
-      <br />
-      <InvoiceExtractor />
-      <br />
-      <NumberStatistics />
-      <br />
-      <ListComparator />
-    </main>
+    <Provider store={store}>
+      <Toast />
+      <App />
+    </Provider>
+
   )
 }

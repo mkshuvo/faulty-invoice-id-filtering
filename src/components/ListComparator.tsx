@@ -1,6 +1,7 @@
 'use client'
 import React, { useState } from "react";
 import { Button, Col, Container, Form, Row } from "react-bootstrap";
+import { toast } from "react-toastify";
 
 interface ListComparatorProps { }
 
@@ -33,6 +34,16 @@ const ListComparator: React.FC<ListComparatorProps> = () => {
 
     setMatched(matchedNumbers);
     setUnmatched(unmatchedNumbers);
+    toast.info('Done!', {
+      position: "bottom-left",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "colored",
+    });
   };
 
   return (

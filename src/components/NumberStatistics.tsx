@@ -1,6 +1,7 @@
 'use client';
 import React, { useState } from "react";
 import { Button, Col, Container, Form, Row } from "react-bootstrap";
+import { toast } from "react-toastify";
 
 interface NumberStatisticsProps { }
 
@@ -31,11 +32,21 @@ const NumberStatistics: React.FC<NumberStatisticsProps> = () => {
 
     setStatistics(statisticsArray);
     setUniqueNumbers(Array.from(frequencyMap.keys()).sort((a, b) => a - b));
+    toast.info('Done!', {
+      position: "bottom-left",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "colored",
+    });
   };
 
   return (
     <Container className="my-3">
-      <h1><span>🔷 </span>Number Statistics</h1>
+      <h1><span>🔷 </span>Number Frequency</h1>
       <Row className="my-3">
         <Col xs={12}>
           <Form.Group>
